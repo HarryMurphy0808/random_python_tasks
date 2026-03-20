@@ -1,0 +1,13 @@
+num1 = int(input('first number: '))
+num2 = int(input('second number: '))
+num3 = int(input('third number: '))
+first = (((3*a) + 4/b) - c)
+print(first)
+second = (a**b)/c
+print(second)
+third = (a*c) - (b*c)
+print(third)
+fourth = (b%a) + (a%c)
+print(fourth)
+fifth = a**(b**c)
+print(fifth)

@@ -1,0 +1,167 @@
+import random
+import string
+
+# -------------------------
+# Data setup
+# -------------------------
+
+adult_price = 10.0
+child_price = 6.0
+
+available_movies = {
+    "Interstellar": {
+        "18:00": {"bookable": True, "seats": ["A1", "A2", "A3", "B1", "B2"]},
+        "21:00": {"bookable": True, "seats": ["A1", "A2", "B1"]}
+    },
+    "Inception": {
+        "17:30": {"bookable": False, "seats": ["A1", "A2"]},
+        "20:00": {"bookable": True, "seats": ["A1", "A2", "A3", "A4"]}
+    }
+}
+
+bookings = []
+
+# -------------------------
+# Helper functions
+# -------------------------
+
+def generate_ref():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+def screenings_for(movie):
+    return available_movies.get(movie, {})
+
+def seats_for(movie, screening):
+    return available_movies[movie][screening]["seats"]
+
+# -------------------------
+# Program start
+# -------------------------
+
+# DISPLAY available_movies
+if not available_movies:
+    print("No movies available")
+    exit()
+
+print("Available movies:")
+for movie in available_movies:
+    print("-", movie)
+
+# -------------------------
+# Select movie
+# -------------------------
+
+while True:
+    movie = input("Select a movie: ").strip()
+
+    if movie not in available_movies:
+        print("Invalid movie selection")
+        continue
+
+    screenings = screenings_for(movie)
+    if not screenings:
+        print("No screenings available for this movie. Choose another movie.")
+        continue
+
+    break
+
+# -------------------------
+# Select screening
+# -------------------------
+
+while True:
+    print("\nAvailable screenings:")
+    for s, info in screenings.items():
+        status = "Bookable" if info["bookable"] else "Not bookable"
+        print(f"- {s} ({status})")
+
+    screening = input("Select a screening: ").strip()
+
+    if screening not in screenings or not screenings[screening]["bookable"]:
+        print("Invalid screening selection")
+        continue
+
+    break
+
+# -------------------------
+# Select seats
+# -------------------------
+
+while True:
+    available_seats = seats_for(movie, screening)
+
+    print("\nAvailable seats:", ", ".join(available_seats))
+    seat_input = input("Select seats (comma separated): ").strip()
+
+    seats = [s.strip().upper() for s in seat_input.split(",") if s.strip()]
+
+    if not seats:
+        print("Please select at least one seat")
+        continue
+
+    if any(seat not in available_seats for seat in seats):
+        print("Selected seats are no longer available")
+        continue
+
+    break
+
+# -------------------------
+# Ticket numbers
+# -------------------------
+
+while True:
+    try:
+        adults = int(input("Number of adults: "))
+        children = int(input("Number of children: "))
+    except ValueError:
+        print("Please enter valid numbers")
+        continue
+
+    if adults < 0 or children < 0 or (adults + children) != len(seats):
+        print("Ticket numbers must match selected seats")
+        continue
+
+    break
+
+# -------------------------
+# Name
+# -------------------------
+
+while True:
+    name = input("Enter your name: ").strip()
+    if not name:
+        print("Please enter your name")
+        continue
+    break
+
+# -------------------------
+# Booking confirmation
+# -------------------------
+
+try:
+    price = (adults * adult_price) + (children * child_price)
+    ref = generate_ref()
+
+    booking = {
+        "ref": ref,
+        "movie": movie,
+        "screening": screening,
+        "seats": seats,
+        "adults": adults,
+        "children": children,
+        "price": price,
+        "name": name
+    }
+
+    bookings.append(booking)
+
+    # MARK seats as booked
+    for seat in seats:
+        available_movies[movie][screening]["seats"].remove(seat)
+
+    print("\nBooking confirmed")
+    print("Reference:", ref)
+    print("Total price: £", price)
+
+except Exception:
+    print("Something went wrong. Please try again.")
